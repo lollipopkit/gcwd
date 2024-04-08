@@ -1,10 +1,10 @@
 ## Git Commit with Date
 
 ```bash
-gcwd DATE
+gcwd '{TIME}'
 ```
 
-Valid DATE formats:
+Valid `TIME` formats:
 - `HH:MM` or `HH:MM:SS`
 - `HH-MM` or `HH-MM-SS`
 - `YYYY-MM-DD HH:MM:SS`

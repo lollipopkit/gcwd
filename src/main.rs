@@ -6,22 +6,31 @@ static CYAN: &str = "\x1b[36m";
 static RESET: &str = "\x1b[0m";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let time = std::env::args().nth(1).expect("No time provided");
-    let full_time = parse_full_time(&time)?;
-    println!("Committing at: {CYAN}{full_time}{RESET}");
-    git_commit(full_time)
+    if let Some(time) = std::env::args().nth(1) {
+        let full_time = parse_full_time(&time)?;
+        println!("Committing at: {CYAN}{full_time}{RESET}");
+        git_commit(full_time)
+    } else {
+        println!("Usage: gcwd TIME");
+        Ok(())
+    }
 }
 
 fn parse_full_time(full_time: &str) -> Result<String, String> {
     let parts: Vec<&str> = full_time.split(' ').collect();
-    if parts.len() != 2 {
-        let time = parse_time(full_time)?.format("%H:%M:%S");
-        let date = Local::now().format("%Y-%m-%d");
-        return Ok(format!("{date} {time}"));
+    match parts.len() {
+        1 => {
+            let time = parse_time(full_time)?.format("%H:%M:%S");
+            let date = Local::now().format("%Y-%m-%d");
+            Ok(format!("{date} {time}"))
+        }
+        2 => {
+            let date = parse_date(parts[0])?.format("%Y-%m-%d");
+            let time = parse_time(parts[1])?.format("%H:%M:%S");
+            Ok(format!("{date} {time}"))
+        }
+        _ => Err(format!("Invalid time format: {full_time}"))
     }
-    let date = parse_date(parts[0])?.format("%Y-%m-%d");
-    let time = parse_time(parts[1])?.format("%H:%M:%S");
-    Ok(format!("{date} {time}"))
 }
 
 fn parse_time(time: &str) -> Result<NaiveTime, String> {
@@ -53,7 +62,8 @@ fn git_commit(time: String) -> Result<(), Box<dyn std::error::Error>> {
         .env("GIT_COMMITTER_DATE", &time)
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
-        .spawn()?.wait()?;
+        .spawn()?
+        .wait()?;
     if output.success() {
         Ok(())
     } else {
