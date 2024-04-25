@@ -498,11 +498,13 @@ dependencies = [
 
 [[package]]
 name = "gcwd"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "chrono",
  "clap",
+ "reqwest",
  "self_update",
+ "tempfile",
 ]
 
 [[package]]
