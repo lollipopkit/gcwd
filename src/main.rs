@@ -2,10 +2,13 @@ use std::process::Stdio;
 
 use chrono::{Local, NaiveDate, NaiveTime};
 
+mod update;
+
 static CYAN: &str = "\x1b[36m";
 static RESET: &str = "\x1b[0m";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    update::update()?;
     if let Some(time) = std::env::args().nth(1) {
         let full_time = parse_full_time(&time)?;
         println!("Committing at: {CYAN}{full_time}{RESET}");

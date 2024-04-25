@@ -1,4 +1,5 @@
-## Git Commit with Date
+## gcwd
+Submit your Git commit with sepcific date.
 
 ```bash
 gcwd '{TIME}'
