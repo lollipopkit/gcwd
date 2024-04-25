@@ -8,6 +8,7 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.37"
+clap = { version = "4.5.4", features = ["derive"] }
 self_update = { version = "0.39.0", features = ["archive-tar"] }
 
 [profile.release]
