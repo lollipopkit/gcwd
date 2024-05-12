@@ -5,22 +5,21 @@ use clap::Parser;
 use ctx::Ctx;
 
 mod ctx;
-mod update;
 mod res;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut ctx = Ctx::parse();
 
-    if ctx.update {
-        update::update()?;
-    }
-
     if let Some(ref time) = ctx.time {
         let full_time = parse_full_time(time)?;
-        println!("Committing at: {}{full_time}{}", res::TERM_YELLOW, res::TERM_RESET);
+        println!(
+            "Committing at: {}{full_time}{}",
+            res::TERM_YELLOW,
+            res::TERM_RESET
+        );
         ctx.time = Some(full_time);
         git_commit(&ctx)?;
-    } else if !ctx.update {
+    } else {
         eprintln!("No time provided");
     }
 
@@ -67,20 +66,17 @@ fn parse_date(date: &str) -> Result<NaiveDate, String> {
 }
 
 fn git_commit(ctx: &Ctx) -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = std::process::Command::new("git");
     let time = ctx.time.as_ref().unwrap();
-    let cmd = match ctx.message {
-        Some(ref msg) => cmd
-            .arg("commit")
-            .arg("-m")
-            .arg(msg)
-            .env("GIT_AUTHOR_DATE", time)
-            .env("GIT_COMMITTER_DATE", time),
-        None => cmd
-            .arg("commit")
-            .env("GIT_AUTHOR_DATE", time)
-            .env("GIT_COMMITTER_DATE", time),
-    };
+    let mut cmd = std::process::Command::new("git");
+    cmd.arg("commit");
+    if ctx.sign {
+        cmd.arg("-S");
+    }
+    if let Some(ref msg) = ctx.message {
+        cmd.arg("-m").arg(msg);
+    }
+    cmd.env("GIT_AUTHOR_DATE", time);
+    cmd.env("GIT_COMMITTER_DATE", time);
     let output = cmd
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
