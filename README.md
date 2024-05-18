@@ -5,7 +5,9 @@ Submit your Git commit with sepcific date.
 # Basic
 gcwd 13:37
 # With message
-gcwd '13:37' -m 'Hello World!'
+gcwd -m 'Hello World!' '13:37'
+# Signed commit
+gcwd -s '13:37'
 ```
 
 ## CLI
@@ -16,8 +18,8 @@ Arguments:
   [TIME]  
 
 Options:
-  -u, --update             Check gcwd update
   -m, --message <MESSAGE>  Commit message
+  -s, --sign               Sign commit
   -h, --help               Print help
   -V, --version            Print version
 ```
